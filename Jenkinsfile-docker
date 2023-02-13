@@ -4,6 +4,8 @@ pipeline {
         registryCredential = 'ecr:eu-west-1:awslogin'
         appRegistry = "367800374360.dkr.ecr.eu-west-1.amazonaws.com/appimg"
         vprofileRegistry = "https://367800374360.dkr.ecr.eu-west-1.amazonaws.com"
+        cluster = "cluster-app"
+        service = "cluster-svc"
     }
 
     stages {
@@ -73,6 +75,14 @@ pipeline {
                   }
                 }
               }
+        }
+
+        stage('Deploy to ECS') {
+             steps {
+           withAWS(credentials: 'awslogin', region: 'eu-west-1') {
+             sh 'aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment'
+           }
+         }
         }
     }
 }
